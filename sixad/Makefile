@@ -35,6 +35,8 @@ install:
 	install -m 755 $(BINDIR)/sixad-3in1 $(DESTDIR)/usr/sixad/$(INSTALLDIR)/
 	install -m 755 $(BINDIR)/sixad-raw $(DESTDIR)/usr/sixad/$(INSTALLDIR)/
 	install -m 755 sixad-dbus-blocker $(DESTDIR)/usr/sbin/
+	@chmod 777 -R $(DESTDIR)/var/lib/sixad/
+	@echo "Installation is Complete!"
 
 ifeq "$(wildcard /usr/bin/python2 )" ""
 else
