@@ -504,63 +504,63 @@ int set_sixaxis_led(int csk, struct dev_led led, int rumble)
     if (led.enabled && led.anim)
     {
         /* Sixaxis LED animation - Way Cool!! */
-        if (rumble) setleds[3] = setleds[5] = 0xfe;
+        if (rumble) setleds_orig[3] = setleds_orig[5] = 0xfe;
         for (int i=0; i<4; i++) {  // repeat it 4 times
-            if (rumble) setleds[4] = setleds[6] = 0xff;
-            setleds[11] = ledpattern[1];
-            send(csk, setleds, sizeof(setleds), 0);
+            if (rumble) setleds_orig[4] = setleds_orig[6] = 0xff;
+            setleds_orig[11] = ledpattern[1];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(10000);
-            setleds[11] = ledpattern[2];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[2];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(5000);
-            setleds[11] = ledpattern[3];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[3];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(5000);
-            setleds[11] = ledpattern[4];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[4];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(10000);
-            setleds[11] = ledpattern[3];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[3];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(5000);
-            setleds[11] = ledpattern[2];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[2];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(5000);
         }
         /* 2nd part of animation (animate until LED reaches selected number) */
         if (led_n == 2 || led_n == 6 || led_n == 9)
         {
-            setleds[11] = ledpattern[1];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[1];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
         }
         else if (led_n == 3 || led_n == 7)
         {
-            setleds[11] = ledpattern[1];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[1];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(10000);
-            setleds[11] = ledpattern[2];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[2];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
         }
         else if (led_n == 4 || led_n == 8)
         {
-            setleds[11] = ledpattern[1];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[1];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(100000);
-            setleds[11] = ledpattern[2];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[2];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
             usleep(50000);
-            setleds[11] = ledpattern[3];
-            send(csk, setleds, sizeof(setleds), 0);
+            setleds_orig[11] = ledpattern[3];
+            send(csk, setleds_orig, sizeof(setleds_orig), 0);
             recv(csk, buf, sizeof(buf), 0);
         }
     }
