@@ -437,21 +437,28 @@ void do_rumble(int csk, int led_n, int weak, int strong, int timeout)
     setrumble_orig[11] = ledpattern[led_n]; //keep old led
     send(csk, setrumble_orig, sizeof(setrumble_orig), 0);
 
+#ifdef GASIA_GAMEPAD_HACKS
     setrumble_gasia[11] = ledpattern[led_n]; //keep old led
     send(csk, setrumble_gasia, sizeof(setrumble_gasia), 0);
+#else
+    unsigned char buf[128];
+    recv(csk, buf, sizeof(buf), 0); //MSG_DONTWAIT?
+#endif
 }
 
 int set_sixaxis_led(int csk, struct dev_led led, int rumble)
 {
     int led_n, led_number;
-    
+#ifndef GASIA_GAMEPAD_HACKS
+    unsigned char buf[128];
+#endif
+
     const unsigned char ledpattern[11] = {
         0x00,
         0x02, 0x04, 0x08, 0x10, // 1, 2, 3, 4
         0x12, 0x14, 0x18, 0x1A, // 5, 6, 7, 8
         0x1C, 0x1E  // 9, 10
     };
-
 
     unsigned char setleds_orig[] = {
         0x52, /* HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUTPUT */
@@ -493,13 +500,83 @@ int set_sixaxis_led(int csk, struct dev_led led, int rumble)
     } else
         led_n = 0;
 
+#ifndef GASIA_GAMEPAD_HACKS
+    if (led.enabled && led.anim)
+    {
+        /* Sixaxis LED animation - Way Cool!! */
+        if (rumble) setleds[3] = setleds[5] = 0xfe;
+        for (int i=0; i<4; i++) {  // repeat it 4 times
+            if (rumble) setleds[4] = setleds[6] = 0xff;
+            setleds[11] = ledpattern[1];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(10000);
+            setleds[11] = ledpattern[2];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(5000);
+            setleds[11] = ledpattern[3];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(5000);
+            setleds[11] = ledpattern[4];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(10000);
+            setleds[11] = ledpattern[3];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(5000);
+            setleds[11] = ledpattern[2];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(5000);
+        }
+        /* 2nd part of animation (animate until LED reaches selected number) */
+        if (led_n == 2 || led_n == 6 || led_n == 9)
+        {
+            setleds[11] = ledpattern[1];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+        }
+        else if (led_n == 3 || led_n == 7)
+        {
+            setleds[11] = ledpattern[1];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(10000);
+            setleds[11] = ledpattern[2];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+        }
+        else if (led_n == 4 || led_n == 8)
+        {
+            setleds[11] = ledpattern[1];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(100000);
+            setleds[11] = ledpattern[2];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+            usleep(50000);
+            setleds[11] = ledpattern[3];
+            send(csk, setleds, sizeof(setleds), 0);
+            recv(csk, buf, sizeof(buf), 0);
+        }
+    }
+#endif
+
     setleds_orig[11] = ledpattern[led_n];
     if (rumble) setleds_orig[3] = setleds_orig[4] = setleds_orig[5] = setleds_orig[6] = 0x00;
     send(csk, setleds_orig, sizeof(setleds_orig), 0);
 
+#if defined(GASIA_GAMEPAD_HACKS)
     setleds_gasia[11] = ledpattern[led_n];
     if (rumble) setleds_gasia[3] = setleds_gasia[4] = setleds_gasia[5] = setleds_gasia[6] = 0x00;
     send(csk, setleds_gasia, sizeof(setleds_gasia), 0);
+#else
+    recv(csk, buf, sizeof(buf), 0);
+#endif
 
     return led_n;
 }

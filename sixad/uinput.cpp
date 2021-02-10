@@ -65,9 +65,13 @@ struct uinput_fd *uinput_open(int DEV_TYPE, const char *mac, struct device_setti
     memset(&dev_mk, 0, sizeof(dev_mk));
 
     if (DEV_TYPE == DEV_TYPE_SIXAXIS) {
+#if defined(GASIA_GAMEPAD_HACKS) || defined(SHANWAN_FAKE_DS3)
+        strcpy(dev_name, "PLAYSTATION(R)3 Controller");
+#else
         strcpy(dev_name, "PLAYSTATION(R)3 Controller (");
         strcat(dev_name, mac);
         strcat(dev_name, ")");
+#endif
         snprintf(dev.name, sizeof(dev.name), "%s", dev_name);
         dev.id.vendor = 0x054c;
         dev.id.product = 0x0268;
@@ -90,7 +94,7 @@ struct uinput_fd *uinput_open(int DEV_TYPE, const char *mac, struct device_setti
         dev.id.version = 0x0100;
         dev.id.bustype = BUS_VIRTUAL;
     } else {
-        strcpy(dev_name, "Unkown Device (");
+        strcpy(dev_name, "Unknown Device (");
         strcat(dev_name, mac);
         strcat(dev_name, ")");
         snprintf(dev.name, sizeof(dev.name), "%s", dev_name);

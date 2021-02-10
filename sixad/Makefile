@@ -4,6 +4,14 @@ CXX ?= g++
 CXXFLAGS ?= -O2 -Wall
 LDFLAGS += -Wl,-Bsymbolic-functions
 
+ifdef GASIA_GAMEPAD_HACKS
+	CXXFLAGS += -DGASIA_GAMEPAD_HACKS
+endif
+
+ifdef SHANWAN_FAKE_DS3
+	CXXFLAGS += -DSHANWAN_FAKE_DS3
+endif
+
 all: sixad_bins
 
 BINDIR ?= bins

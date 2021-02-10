@@ -51,7 +51,7 @@ bt_start () {
 $SUDO rm -f /tmp/.sixad-dbus-blocker.pid
 env sleep 1
 
-if [ -f /lib/udev/rules.d/97-bluetooth.rules ]; then
+if [ -f /lib/udev/rules.d/97-bluetooth-hid2hci.rules ]; then
   $SUDO /usr/sbin/bluetoothd --udev
 elif [ -f /etc/rc.d/bluetooth ]; then
   $SUDO /etc/rc.d/bluetooth start

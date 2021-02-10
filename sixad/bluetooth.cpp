@@ -203,12 +203,19 @@ void l2cap_accept(int ctl, int csk, int isk, int debug, int legacy)
         return;
     }
 
+#if defined(GASIA_GAMEPAD_HACKS) || defined(SHANWAN_FAKE_DS3)
     req.vendor  = 0x054c;
     req.product = 0x0268;
     req.version = 0x0100;
     req.parser  = 0x0100;
-
+#if defined(GASIA_GAMEPAD_HACKS)
     strcpy(req.name, "Gasia Gamepad experimental driver");
+#else
+    strcpy(req.name, "Shanwan Gamepad experimental driver");
+#endif
+#else
+    get_sdp_device_info(&addr_src, &addr_dst, &req);
+#endif
 
     if (!legacy && req.vendor == 0x054c && req.product == 0x0268) {
         if (debug) syslog(LOG_INFO, "Will initiate Sixaxis now");
@@ -372,15 +379,20 @@ int create_device(int ctl, int csk, int isk)
      req.flags     = 0;
      req.idle_to   = 1800;
 
-
+#if defined(GASIA_GAMEPAD_HACKS) || defined(SHANWAN_FAKE_DS3)
     req.vendor  = 0x054c;
     req.product = 0x0268;
     req.version = 0x0100;
     req.parser  = 0x0100;
-
+#if defined(GASIA_GAMEPAD_HACKS)
     strcpy(req.name, "Gasia Gamepad experimental driver");
-
+#else
+    strcpy(req.name, "Shanwan Gamepad experimental driver");
+#endif
     err = 0;
+#else
+    err = get_sdp_device_info(&src, &dst, &req);
+#endif
 
      if (err < 0)
          return err;

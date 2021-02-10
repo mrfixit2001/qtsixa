@@ -288,6 +288,12 @@ void enable_sixaxis(int csk)
         0xf4, 0x42, 0x03, 0x00, 0x00
     };
 
+    /* enable reporting */
     send(csk, enable_orig, sizeof(enable_orig), 0);
+#if defined(GASIA_GAMEPAD_HACKS) 
     send(csk, enable_gasia, sizeof(enable_gasia), 0);
+#else
+    char buf[128];
+    recv(csk, buf, sizeof(buf), 0);
+#endif
 }

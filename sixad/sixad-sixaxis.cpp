@@ -20,6 +20,7 @@
 #include "uinput.h"
 
 #include <cstdlib>
+#include <errno.h>
 #include <iostream>
 #include <poll.h>
 #include <signal.h>
@@ -254,6 +255,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+#ifdef SHANWAN_FAKE_DS3
+    timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 50000;  // 0.05 sec.
+
+    if (-1 == setsockopt(csk, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
+        syslog(LOG_ERR, "could not set socket read timeout, error: %s", strerror(errno));
+#endif
+
     enable_sixaxis(csk);
     led_n = set_sixaxis_led(csk, settings.led, settings.rumble.enabled);
 
@@ -352,11 +362,25 @@ int main(int argc, char *argv[])
         uinput_close(ufd->mk, debug);
     }
 
+#ifndef SHANWAN_FAKE_DS3
     delete ufd;
-
+#endif
 
     shutdown(isk, SHUT_RDWR);
     shutdown(csk, SHUT_RDWR);
+
+#if defined(SHANWAN_FAKE_DS3)
+    delete ufd;
+
+    // hack for force disconnect
+    char cmd[32] = { 0 };
+    strcpy(cmd, "hcitool dc ");
+    strcat(cmd, mac);
+
+    usleep(10*1000);
+    syslog(LOG_INFO, "Force disconnect of \"%s\"", mac);
+    system(cmd);
+#endif
 
     if (debug) syslog(LOG_INFO, "Done");
 
