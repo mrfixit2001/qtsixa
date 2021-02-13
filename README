@@ -1,5 +1,9 @@
-I've hacked the code a bit to make sixad work with original and fake GASIA controllers at the same time 
-Using it for RetroPie (tested with one original and one fake over bluetooth). 
+Mrfixit: 
+I've changed this source to have 3 compile paths:
+1) Compatibility with original and GASIA controllers - cflag GASIA_GAMEPAD_HACKS
+2) Compatibility with original and SHANWAN controllers - cflag SHANWAN_FAKE_DS3
+3) Compatibility with original
+
 
 Original README follows:
 -------------------------------------
