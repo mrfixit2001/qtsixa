@@ -42,10 +42,12 @@
 #define SIXAXIS_KEY_PS       0x01
 
 struct rumble_effect {
-    int id;
-    int weak;
-    int strong;
-    int timeout;
+	rumble_effect() {}
+	rumble_effect(int i, int w, int s, int t) : id(i), weak(w), strong(s), timeout(t) {}
+	int id;
+	int weak;
+	int strong;
+	int timeout;
 };
 
 void do_joystick(int fd, unsigned char* buf, struct dev_joystick joystick);
