@@ -147,11 +147,21 @@ static void rumble_listen()
 	pthread_exit((void*)1);
 }
 
-static int get_time()
+static int get_time_min()
 {
 	timespec tp;
 	if (!clock_gettime(CLOCK_MONOTONIC, &tp)) {
 		return tp.tv_sec/60;
+	} else {
+		return -1;
+	}
+}
+
+static int get_time_sec()
+{
+	timespec tp;
+	if (!clock_gettime(CLOCK_MONOTONIC, &tp)) {
+		return tp.tv_sec;
 	} else {
 		return -1;
 	}
@@ -163,7 +173,8 @@ static void process_sixaxis(struct device_settings settings, const char *mac)
 	bool msg = true;
 	unsigned char buf[128];
 
-	int last_time_action = get_time();
+	int last_time_action = get_time_min();
+	int time_start_ps3but = 0;
 
 	while (!io_canceled()) {
 		br = read(isk, buf, sizeof(buf));
@@ -173,7 +184,7 @@ static void process_sixaxis(struct device_settings settings, const char *mac)
 		}
 
 		if (settings.timeout.enabled) {
-			int current_time = get_time();
+			int current_time = get_time_min();
 			if (was_active()) {
 			last_time_action = current_time;
 			set_active(false);
@@ -182,6 +193,24 @@ static void process_sixaxis(struct device_settings settings, const char *mac)
 			sig_term(0);
 			break;
 			}
+		}
+
+		// Disconnect's the controller if the ps button is held down for 10 seconds
+		//	This is important because many fake ps3 controllers do not turn off
+		//	when the ps button is held. This will disconnect the controller
+		//	which causes all of them to poweroff.
+		if (time_start_ps3but != 0 || buf[5] & 0x01){
+			if(buf[5] & 0x01){
+				int current_time = get_time_sec();
+				if(time_start_ps3but == 0){
+					time_start_ps3but = current_time;
+				} else if(current_time-time_start_ps3but >= 10){
+					syslog(LOG_ERR, "PS Button held down --- disconneting now...");
+					sig_term(0);
+					break;
+				}
+			} else
+			time_start_ps3but = 0;
 		}
 
 		if (br < 0) {
