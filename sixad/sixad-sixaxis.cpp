@@ -205,7 +205,7 @@ static void process_sixaxis(struct device_settings settings, const char *mac)
 				if(time_start_ps3but == 0){
 					time_start_ps3but = current_time;
 				} else if(current_time-time_start_ps3but >= 10){
-					syslog(LOG_ERR, "PS Button held down --- disconneting now...");
+					syslog(LOG_ERR, "PS Button held down --- disconnecting now...");
 					sig_term(0);
 					break;
 				}
